@@ -1,9 +1,10 @@
 # Troby
+##Achievements/Trophys but for board games!
 
-Achievements/Trophys but for board games!
+#Technologies
+- Database (MySQL)
+- API (ASP.NET)
+- HTML
+- CSS (Bulma)
+- JavaScript (Vue.js)
 
-This project consist of:
-
-Database (MySQL)
-API (ASP.NET)
-Website (HTML+CSS-Bulma+JS-Vue.js)
