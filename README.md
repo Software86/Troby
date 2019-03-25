@@ -1,5 +1,5 @@
 # Troby
-## Achievements/Trophys but for board games!
+### Achievements/Trophys but for board games!
 
 # Technologies
 - Database (MySQL)
