@@ -1,7 +1,6 @@
 # Troby
-## Achievements/Trophys but for board games!
 
-# Technologies
+## Technologies
 - Database (MySQL)
 - API (ASP.NET)
 - HTML
