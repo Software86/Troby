@@ -14,7 +14,6 @@ namespace Troby
     {
         public static void Main(string[] args)
         {
-            System.Diagnostics.Trace.WriteLine("asdadsdas");
             CreateWebHostBuilder(args).Build().Run();
         }
 

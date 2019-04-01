@@ -9,6 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Troby.models;
 using Troby.Data;
 using System.Text.RegularExpressions;
+using MySql.Data.MySqlClient;
+using Troby.Models;
 
 namespace Troby.Controllers
 {
@@ -18,23 +20,26 @@ namespace Troby.Controllers
     {
         private readonly trobyContext _context;
         private readonly IConfiguration _config;
+        private readonly DbHandler _db;
 
         public UsersController(trobyContext context, IConfiguration config)
         {
             _context = context;
             _config = config;
+            _db = new DbHandler(context, config);
         }
 
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Users>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            return await _db.GetAllAsync();
+            
         }
 
         // GET: api/Users/kalle@asd.se
         [HttpGet("{email}")]
-        public async Task<ActionResult<Users>> GetUsers(string email)
+        public async Task<ActionResult<Users>> GetUser(string email)
         {
             Users user = await _context.Users.FirstOrDefaultAsync(usr => usr.Email == email);
             if (user == null) return NotFound();
@@ -43,17 +48,17 @@ namespace Troby.Controllers
 
         // POST: api/Users
         [HttpPost]
-        public async Task<ActionResult<Users>> PostUsers([FromForm]string email, [FromForm]string pass)
+        public ActionResult<Users> PostUsers([FromForm]string email, [FromForm]string pass)
         {
-            string regex = _config.GetSection("regex")["username"];
-            Regex reg = new Regex(@regex);
-            if (!reg.IsMatch(email))
-            {
-                return StatusCode(406, "Email not valid");
-            }
-            Hash hash = new Hash(pass);
-            string generatedHash = hash.ComputeHash();
-            return StatusCode(200, generatedHash);
+            return _db.CreateNewUser(email, pass);
+        }
+
+        // POST: api/Users
+        [HttpPost]
+        [Route("Login")]
+        public ActionResult<Key> LoginUser([FromForm]string email, [FromForm]string pass)
+        {
+            return _db.Login(email, pass);
         }
 
         //put: api/users/5
@@ -105,9 +110,6 @@ namespace Troby.Controllers
             return true;
         }
         
-        private bool UsersExists(string email)
-        {
-            return _context.Users.Any(e => e.Email == email);
-        }
+        
     }
 }
