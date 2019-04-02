@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Troby.models
+namespace Troby.Models
 {
     public partial class Ownership
     {
         public int GameId { get; set; }
-        public string UserId { get; set; }
+        public string UserEmail { get; set; }
+        public int Id { get; set; }
 
-        public virtual Games Game { get; set; }
-        public virtual Users User { get; set; }
+        public virtual Users UserEmailNavigation { get; set; }
     }
 }

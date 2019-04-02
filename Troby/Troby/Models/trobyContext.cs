@@ -1,34 +1,32 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Configuration;
 
-namespace Troby.models
+namespace Troby.Models
 {
     public partial class trobyContext : DbContext
     {
-        private readonly IConfiguration _configuration;
+        public trobyContext()
+        {
+        }
 
-        public trobyContext(DbContextOptions<trobyContext> options, IConfiguration config)
+        public trobyContext(DbContextOptions<trobyContext> options)
             : base(options)
         {
-            _configuration = config;
         }
 
         public virtual DbSet<Achievements> Achievements { get; set; }
         public virtual DbSet<Games> Games { get; set; }
         public virtual DbSet<Ownership> Ownership { get; set; }
-        public virtual DbSet<Tokens> Tokens { get; set; }
         public virtual DbSet<Unlocks> Unlocks { get; set; }
         public virtual DbSet<Users> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string connectionString = _configuration.GetConnectionString("MySQLConnectionString");
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseMySql(connectionString);
+                optionsBuilder.UseMySql("Server=localhost;Database=troby;Uid=root;Pwd=root;");
             }
         }
 
@@ -39,7 +37,7 @@ namespace Troby.models
                 entity.ToTable("achievements");
 
                 entity.HasIndex(e => e.GameId)
-                    .HasName("gameId");
+                    .HasName("FK_achievements_games");
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
@@ -61,7 +59,7 @@ namespace Troby.models
                     .HasColumnName("title")
                     .HasColumnType("varchar(30)");
 
-                entity.Property(e => e.Worth)
+                entity.Property(e => e.worth)
                     .HasColumnName("worth")
                     .HasColumnType("enum('bronze','silver','gold','platinum')");
 
@@ -69,7 +67,7 @@ namespace Troby.models
                     .WithMany(p => p.Achievements)
                     .HasForeignKey(d => d.GameId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("achievements_ibfk_1");
+                    .HasConstraintName("FK_achievements_games");
             });
 
             modelBuilder.Entity<Games>(entity =>
@@ -88,6 +86,10 @@ namespace Troby.models
                     .HasColumnName("description")
                     .HasColumnType("text");
 
+                entity.Property(e => e.Image)
+                    .HasColumnName("image")
+                    .HasColumnType("text");
+
                 entity.Property(e => e.Name)
                     .HasColumnName("name")
                     .HasColumnType("varchar(30)");
@@ -99,63 +101,29 @@ namespace Troby.models
 
             modelBuilder.Entity<Ownership>(entity =>
             {
-                entity.HasKey(e => new { e.GameId, e.UserId })
-                    .HasName("PRIMARY");
-
                 entity.ToTable("ownership");
 
-                entity.HasIndex(e => e.UserId)
-                    .HasName("FK_ownership_users_idx");
+                entity.HasIndex(e => e.UserEmail)
+                    .HasName("asd_idx");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(11)");
 
                 entity.Property(e => e.GameId)
                     .HasColumnName("gameId")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.UserId)
-                    .HasColumnName("userId")
+                entity.Property(e => e.UserEmail)
+                    .IsRequired()
+                    .HasColumnName("userEmail")
                     .HasColumnType("varchar(255)");
 
-                entity.HasOne(d => d.Game)
+                entity.HasOne(d => d.UserEmailNavigation)
                     .WithMany(p => p.Ownership)
-                    .HasForeignKey(d => d.GameId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_ownership_games");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.Ownership)
-                    .HasForeignKey(d => d.UserId)
+                    .HasForeignKey(d => d.UserEmail)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ownership_users");
-            });
-
-            modelBuilder.Entity<Tokens>(entity =>
-            {
-                entity.HasKey(e => e.TokenString)
-                    .HasName("PRIMARY");
-
-                entity.ToTable("tokens");
-
-                entity.HasIndex(e => e.Owner)
-                    .HasName("FK_tokens_users_idx");
-
-                entity.Property(e => e.TokenString)
-                    .HasColumnName("tokenString")
-                    .HasColumnType("varchar(45)");
-
-                entity.Property(e => e.DateCreated)
-                    .HasColumnName("dateCreated")
-                    .HasColumnType("date");
-
-                entity.Property(e => e.Owner)
-                    .IsRequired()
-                    .HasColumnName("owner")
-                    .HasColumnType("varchar(255)");
-
-                entity.HasOne(d => d.OwnerNavigation)
-                    .WithMany(p => p.Tokens)
-                    .HasForeignKey(d => d.Owner)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_tokens_users");
             });
 
             modelBuilder.Entity<Unlocks>(entity =>
@@ -179,10 +147,6 @@ namespace Troby.models
                 entity.Property(e => e.Date)
                     .HasColumnName("date")
                     .HasColumnType("date");
-
-                entity.Property(e => e.Unlockscol)
-                    .HasColumnName("unlockscol")
-                    .HasColumnType("int(11)");
 
                 entity.Property(e => e.UserId)
                     .HasColumnName("userId")

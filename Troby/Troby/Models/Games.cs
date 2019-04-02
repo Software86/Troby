@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Troby.models
+namespace Troby.Models
 {
     public partial class Games
     {
         public Games()
         {
             Achievements = new HashSet<Achievements>();
-            Ownership = new HashSet<Ownership>();
         }
 
         public int Id { get; set; }
@@ -16,8 +15,8 @@ namespace Troby.models
         public string Bgg { get; set; }
         public string Description { get; set; }
         public int? Year { get; set; }
+        public string Image { get; set; }
 
         public virtual ICollection<Achievements> Achievements { get; set; }
-        public virtual ICollection<Ownership> Ownership { get; set; }
     }
 }

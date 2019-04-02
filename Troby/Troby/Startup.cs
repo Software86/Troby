@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Troby
 {
@@ -19,7 +20,6 @@ namespace Troby
         {
             
             Configuration = configuration;
-
         }
 
         public IConfiguration Configuration { get; }
@@ -28,8 +28,12 @@ namespace Troby
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddEntityFrameworkMySql().AddDbContext<models.trobyContext>();
+            services.AddEntityFrameworkMySql().AddDbContext<Models.trobyContext>();
             services.AddSingleton(Configuration);
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Troby API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,6 +52,7 @@ namespace Troby
 
             app.UseHttpsRedirection();
             app.UseMvc();
+            app.UseSwagger();
         }
     }
 }

@@ -6,11 +6,10 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
-namespace Troby.Data
+namespace Troby.Data  
 {
     public class Hasher
     {
-        public string _passwordHash { get; set; }
         private byte[] _saltByte { get; set; }
         private string _password;
         public string salt { get; set; }
@@ -49,23 +48,8 @@ namespace Troby.Data
             return salt;
         }
         
-        public byte[] ConvertToByte(string stringToBeByte)
-        {
-            if (stringToBeByte == null)
-            {
-                throw new ArgumentException("The string cannot be null", stringToBeByte);
-            }
-            return new UTF8Encoding().GetBytes(stringToBeByte);
-            
-        }
+        
 
-        public string ConvertToString(byte[] byteToBeString)
-        {
-            if (byteToBeString == null)
-            {
-                throw new ArgumentException("The array must be initialized", "byteToBeString");
-            }
-            return new UTF8Encoding().GetString(byteToBeString);
-        }
+        
     }
 }
